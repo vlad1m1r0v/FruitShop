@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <title>Fruit Shop</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!--Navbar-->
+<nav class="navbar navbar-expand-lg bg-body-white border-bottom">
+    <div class="container-xl">
+        <a class="navbar-brand" href="#">🍍 Fruit Shop</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarToggler">
+            <form class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0">
+                <input class="form-control me-lg-2 mb-2 mb-lg-0 w-100" type="text" placeholder="Username"
+                       aria-label="Username"/>
+                <input class="form-control me-lg-2 mb-2 mb-lg-0 w-100" type="password" placeholder="Password"
+                       aria-label="Password"/>
+                <button class="btn btn-outline-success w-100" type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<!--Main-->
+<div class="flex-grow-1 bg-body-tertiary">
+    <div class="container-xl py-2">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="row g-2">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover align-middle text-nowrap">
+                            <thead class="text-center">
+                            <tr>
+                                <th colspan="4">Products in warehouse</th>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Actions</th>
+                                <th>Latest operations</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for _ in '0123456789'|make_list %}
+                                <tr>
+                                    <td>Peach</td>
+                                    <td>10</td>
+                                    <td>
+                                        <div class="d-flex flex-nowrap">
+                                            <input style="min-width: 100px" class="form-control me-2" type="number" placeholder="..."/>
+                                            <button class="btn btn-outline-success me-2">Buy</button>
+                                            <button class="btn btn-outline-primary me-2">Sell</button>
+                                        </div>
+                                    </td>
+                                    <td>30.08.25 12:00:00 - Delivered 5 peaches for 20 $</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6"></div>
+                    <div class="col-12 col-lg-6"></div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+<!--Bootstrap-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<!--HTMX-->
+<script
+        src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"
+        integrity="sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm"
+        crossorigin="anonymous"></script>
+</html>
