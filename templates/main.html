@@ -33,6 +33,7 @@
 <div class="flex-grow-1 bg-body-tertiary">
     <div class="container-xl py-2">
         <div class="row">
+            <!--Table-->
             <div class="col-12 col-lg-8">
                 <div class="row g-2">
                     <div class="table-responsive">
@@ -49,13 +50,16 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for _ in '0123456789'|make_list %}
+                            {% for _ in '012345'|make_list %}
                                 <tr>
                                     <td>Peach</td>
                                     <td>10</td>
                                     <td>
                                         <div class="d-flex flex-nowrap">
-                                            <input style="min-width: 100px" class="form-control me-2" type="number" placeholder="..."/>
+                                            <label>
+                                                <input style="width: 100px" class="form-control me-2" type="number"
+                                                       placeholder="...">
+                                            </label>
                                             <button class="btn btn-outline-success me-2">Buy</button>
                                             <button class="btn btn-outline-primary me-2">Sell</button>
                                         </div>
@@ -67,13 +71,48 @@
                         </table>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12 col-lg-6"></div>
+                <div class="row g-2">
+                    <div class="col-12 col-lg-6">
+                        <!--Chat-->
+                        <ul style="max-height: 198px" class="list-group rounded-0 overflow-auto">
+                            {% for index in '0123456789'|make_list %}
+                                <li class="list-group-item">
+                                    11:30 Alexander: Good morning. How are you doing?
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <form class="d-flex flex-row mt-2">
+                            <input class="form-control w-100 me-2" type="text" placeholder="Type here..."
+                                   aria-label="Message"/>
+                            <button class="btn btn-outline-primary" type="submit">Send</button>
+                        </form>
+                    </div>
                     <div class="col-12 col-lg-6"></div>
                 </div>
             </div>
             <div class="col-12 col-lg-4">
-
+                <!--Logs-->
+                <ul style="max-height: 668px" class="list-group rounded-0 overflow-auto">
+                    {% for index in '0123456789'|make_list %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                            <li class="list-group-item">
+                                <span class="text-danger">
+                                    30.08.25 12:00:00 - ERROR: The supplier delivered 10 peaches. Insufficient funds in
+                                    the account. Purchase
+                                    canceled.
+                                </span>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item">
+                                <span class="text-success">
+                                    30.08.25 12:00:00 - SUCCESS: The supplier delivered 10 peaches. $20 was debited from
+                                    the account. The purchase is
+                                    complete.
+                                </span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
