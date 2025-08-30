@@ -5,18 +5,26 @@
             class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0 align-items-center"
     >
         {% csrf_token %}
-        <span class="text-nowrap me-2">{{ request.user.username }}</span>
+        <span class="text-nowrap mb-2 mb-lg-0 me-lg-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
+                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+            </svg>
+            {{ request.user.username }}
+        </span>
         <button class="btn btn-outline-danger w-100" type="submit">Logout</button>
     </form>
 {% else %}
+    <form
+            method="post"
+            action="{% url 'app:login' %}"
+            class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0"
+    >
+        {% csrf_token %}
+        {{ auth_form.username }}
+        {{ auth_form.password }}
+        <button class="btn btn-outline-success w-100" type="submit">Login</button>
+    </form>
 {% endif %}
-<form
-        method="post"
-        action="{% url 'app:login' %}"
-        class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0"
->
-    {% csrf_token %}
-    {{ auth_form.username }}
-    {{ auth_form.password }}
-    <button class="btn btn-outline-success w-100" type="submit">Login</button>
-</form>

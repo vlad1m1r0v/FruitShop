@@ -38,6 +38,8 @@ class LoginView(DjangoLoginView):
 
 
 class LogoutView(DjangoLogoutView):
+    next_page = reverse_lazy('app:page')
+
     def post(self, request, *args, **kwargs):
         messages.success(self.request, 'User logged out successfully.')
         return super(LogoutView, self).post(request, *args, **kwargs)
