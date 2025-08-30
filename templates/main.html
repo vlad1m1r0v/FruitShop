@@ -14,18 +14,12 @@
 <nav class="navbar navbar-expand-lg bg-body-white border-bottom">
     <div class="container-xl">
         <a class="navbar-brand" href="#">🍍 Fruit Shop</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
-                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-toggler"
+                aria-controls="navbar-toggler" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarToggler">
-            <form class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0">
-                <input class="form-control me-lg-2 mb-2 mb-lg-0 w-100" type="text" placeholder="Username"
-                       aria-label="Username"/>
-                <input class="form-control me-lg-2 mb-2 mb-lg-0 w-100" type="password" placeholder="Password"
-                       aria-label="Password"/>
-                <button class="btn btn-outline-success w-100" type="submit">Login</button>
-            </form>
+        <div class="collapse navbar-collapse" id="navbar-toggler">
+            {% include 'partials/auth_form.html' %}
         </div>
     </div>
 </nav>
@@ -180,8 +174,6 @@
 
 </div>
 </body>
-<!--SweetAlert-->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--Bootstrap-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <!--HTMX-->

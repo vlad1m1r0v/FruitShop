@@ -1,0 +1,22 @@
+{% if request.user.is_authenticated %}
+    <form
+            method="post"
+            action="{% url 'app:logout' %}"
+            class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0 align-items-center"
+    >
+        {% csrf_token %}
+        <span class="text-nowrap me-2">{{ request.user.username }}</span>
+        <button class="btn btn-outline-danger w-100" type="submit">Logout</button>
+    </form>
+{% else %}
+{% endif %}
+<form
+        method="post"
+        action="{% url 'app:login' %}"
+        class="d-flex flex-column flex-lg-row ms-auto mt-2 mt-lg-0"
+>
+    {% csrf_token %}
+    {{ auth_form.username }}
+    {{ auth_form.password }}
+    <button class="btn btn-outline-success w-100" type="submit">Login</button>
+</form>
