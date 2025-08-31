@@ -17,7 +17,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
         messages = await sync_to_async(
-            lambda: list(Message.objects.order_by('-timestamp')[:40])
+            lambda: list(Message.objects.order_by('-timestamp').select_related('author')[:40])
         )()
 
         history_html = await sync_to_async(render_to_string)(
@@ -38,10 +38,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         content = data.get('message', '').strip()
         user = self.scope['user']
 
-        message = await sync_to_async(Message.objects.create)(
+        created_message = await sync_to_async(Message.objects.create)(
             author=user,
             content=content
         )
+
+        query = lambda: Message.objects.select_related('author').get(pk=created_message.id)
+        message = await sync_to_async(query)()
 
         message_html = await sync_to_async(render_to_string)(
             template_name='partials/messages_list.html',
