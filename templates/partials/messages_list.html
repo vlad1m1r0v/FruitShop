@@ -1,0 +1,7 @@
+<div hx-swap-oob="beforeend:#messages-list">
+    {% for message in messages %}
+        <li class="list-group-item">
+            {{ message.timestamp|date:"H:i" }} {{ message.author.username }}: {{ message.content }}
+        </li>
+    {% endfor %}
+</div>

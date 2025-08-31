@@ -165,17 +165,18 @@
                 {% endfor %}
             </ul>
         </div>
-        <div id="chat">
-            <ul class="list-group rounded-0">
-                {% for index in '0123456789'|make_list %}
-                    <li class="list-group-item">
-                        11:30 Alexander: Good morning. How are you doing?
-                    </li>
-                {% endfor %}
-            </ul>
-            <form class="d-flex flex-row mt-2">
-                <input class="form-control w-100 me-2" type="text" placeholder="Type here..."/>
-                <button class="btn btn-outline-primary" type="submit">Send</button>
+        <div
+                hx-ext="ws"
+                ws-connect="ws://{{ request.get_host }}/ws/chat/"
+                id="chat"
+        >
+            <ul
+                    id="messages-list"
+                    class="list-group rounded-0"
+            ></ul>
+            <form ws-send class="d-flex flex-row mt-2">
+                <input name="message" class="form-control w-100 me-2" type="text" placeholder="Type here..."/>
+                <button id="send-message" class="btn btn-outline-primary" type="submit">Send</button>
             </form>
         </div>
         <div id="bank" class="card rounded-0 mb-2 mb-xl-0">
@@ -243,4 +244,29 @@
         integrity="sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm"
         crossorigin="anonymous"></script>
 </html>
+<!--HTMX WebSockets-->
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.3/ws.min.js"></script>
 {% include "partials/toasts.html" %}
+<script>
+    document.addEventListener('htmx:oobAfterSwap', function (event) {
+        const targetId = event.detail.target.id;
+
+        if (targetId === 'messages-list') {
+            const messagesList = event.detail.target;
+
+            messagesList.scroll({
+                top: messagesList.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    });
+
+    const chatForm = document.querySelector('#chat form');
+    const messageInput = document.querySelector('#chat form input');
+
+    chatForm.addEventListener('submit', (e) => {
+        setTimeout(() => {
+            messageInput.value = '';
+        }, 100);
+    });
+</script>
