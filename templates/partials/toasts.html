@@ -1,30 +1,24 @@
 <script>
-    const errorGradient = "linear-gradient(315deg, #e34234 0%, #ff3800 74%)";
-    const successGradient = "linear-gradient(159deg, rgba(46,139,87,1) 0%, rgba(64,224,208,1) 100%)";
-
-    const showToast = (message, status) => {
-        const gradient = status === "success" ? successGradient : errorGradient;
-
-        return Toastify({
-            text: message,
-            duration: 3000,
-            newWindow: true,
-            close: true,
-            gravity: "top",
-            position: "left",
-            stopOnFocus: true,
-            style: {
-                background: gradient,
-            },
-            offset: {
-                y: 50
-            },
-        }).showToast();
-    }
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-start',
+        showConfirmButton: false,
+        timer: 40000,
+    });
 
     {% if messages %}
         {% for message in messages %}
-            showToast("{{ message }}", "{{ message.tags }}")
+            {% if "error" in message.tags %}
+                Toast.fire({
+                    icon: 'error',
+                    text: '{{ message|safe }}'
+                });
+            {% elif "success" in message.tags %}
+                Toast.fire({
+                    icon: 'success',
+                    text: '{{ message|safe }}'
+                });
+            {% endif %}
         {% endfor %}
     {% endif %}
 </script>
