@@ -24,21 +24,6 @@
             grid-gap: 0.5em;
         }
 
-        @media (max-width: 991px) {
-            #container {
-                height: fit-content;
-                display: grid;
-                grid-template-areas:
-                    "w"
-                    "e"
-                    "c"
-                    "b";
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto auto;
-                grid-gap: 0.5em;
-            }
-        }
-
         #warehouse {
             grid-area: w;
             width: 100%;
@@ -80,6 +65,26 @@
             width: 100%;
             height: 100%;
             overflow: auto;
+        }
+
+        @media (max-width: 991px) {
+            #container {
+                height: fit-content;
+                display: grid;
+                grid-template-areas:
+                    "w"
+                    "e"
+                    "c"
+                    "b";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                grid-gap: 0.5em;
+            }
+
+            #events-list, #messages-list {
+                max-height: 500px;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
@@ -143,7 +148,7 @@
             </div>
         </div>
         <div id="events">
-            <ul class="list-group rounded-0">
+            <ul id="events-list" class="list-group rounded-0">
                 {% for index in '0123456789'|make_list %}
                     {% if forloop.counter0|divisibleby:2 %}
                         <li class="list-group-item">
@@ -174,9 +179,29 @@
                     id="messages-list"
                     class="list-group rounded-0"
             ></ul>
-            <form ws-send class="d-flex flex-row mt-2">
-                <input name="message" class="form-control w-100 me-2" type="text" placeholder="Type here..."/>
-                <button id="send-message" class="btn btn-outline-primary" type="submit">Send</button>
+            <form
+                    ws-send
+                    class="d-flex flex-row mt-2"
+            >
+                <input
+                        name="message"
+                        class="form-control w-100 me-2"
+                        type="text"
+                        placeholder="Type here..."
+                        {% if not request.user.is_authenticated %}
+                        disabled
+                        {% endif %}
+                />
+                <button
+                        id="send-message"
+                        class="btn btn-outline-primary"
+                        type="submit"
+                        {% if not request.user.is_authenticated %}
+                        disabled
+                        {% endif %}
+                >
+                    Send
+                </button>
             </form>
         </div>
         <div id="bank" class="card rounded-0 mb-2 mb-xl-0">
@@ -248,25 +273,18 @@
 <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.3/ws.min.js"></script>
 {% include "partials/toasts.html" %}
 <script>
+    document.querySelector("form[ws-send]").addEventListener("htmx:wsAfterSend", function (e) {
+        e.target.reset();
+    });
+
     document.addEventListener('htmx:oobAfterSwap', function (event) {
-        const targetId = event.detail.target.id;
+        const target = event.detail.target;
 
-        if (targetId === 'messages-list') {
-            const messagesList = event.detail.target;
-
-            messagesList.scroll({
-                top: messagesList.scrollHeight,
+        if (target.tagName === 'UL') {
+            target.scroll({
+                top: target.scrollHeight,
                 behavior: 'smooth'
             });
         }
-    });
-
-    const chatForm = document.querySelector('#chat form');
-    const messageInput = document.querySelector('#chat form input');
-
-    chatForm.addEventListener('submit', (e) => {
-        setTimeout(() => {
-            messageInput.value = '';
-        }, 100);
     });
 </script>
