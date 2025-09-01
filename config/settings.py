@@ -139,15 +139,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
-CELERY_TASK_QUEUES = {
-    'jokes': {
-        'exchange': 'jokes',
-        'binding_key': 'jokes',
-    },
-}
+from kombu import Queue
+
+CELERY_TASK_DEFAULT_QUEUE = "default"
+
+CELERY_TASK_QUEUES = (
+    Queue("default", routing_key="default"),
+    Queue("jokes", routing_key="jokes"),
+    Queue("audit", routing_key="audit"),
+)
 
 CELERY_TASK_ROUTES = {
-    'src.fruit_shop.tasks.send_joke': {
-        'queue': 'jokes',
-    },
+    "send_joke": {"queue": "jokes", "routing_key": "jokes"},
+    "financial_audit": {"queue": "audit", "routing_key": "audit"},
 }

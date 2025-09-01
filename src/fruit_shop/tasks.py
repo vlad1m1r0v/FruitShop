@@ -1,3 +1,5 @@
+import os
+
 import requests
 
 from celery import shared_task
@@ -12,7 +14,7 @@ from django.contrib.auth.models import User
 from src.fruit_shop.models import Message
 
 
-@shared_task
+@shared_task(name="send_joke", queue="jokes")
 def send_joke():
     response = requests.get('https://official-joke-api.appspot.com/random_joke')
     joke_data = response.json()
@@ -42,3 +44,28 @@ def send_joke():
     countdown = len(content)
 
     send_joke.apply_async(countdown=countdown, queue="jokes")
+
+
+@shared_task(name="financial_audit", queue="audit")
+def financial_audit():
+    channel_layer = get_channel_layer()
+
+    for i in range(50):
+        chunk = os.urandom(1024 * 1024 * 64)
+
+        progress = i * 2
+
+        async_to_sync(channel_layer.group_send)(
+            "audit",
+            {"type": "progress_update", "progress": progress}
+        )
+
+        del chunk
+
+    async_to_sync(channel_layer.group_send)(
+        "audit",
+        {
+            "type": "progress_update",
+            "progress": 100,
+        }
+    )

@@ -1,6 +1,10 @@
+from django.http.response import HttpResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import (
+    TemplateView,
+    View
+)
 from django.contrib.auth.views import (
     LogoutView as DjangoLogoutView,
     LoginView as DjangoLoginView,
@@ -9,6 +13,8 @@ from django.contrib.auth import login
 from django.contrib import messages
 
 from .forms import AuthenticationForm
+
+from .tasks import financial_audit
 
 
 class PageView(TemplateView):
@@ -22,6 +28,7 @@ class PageView(TemplateView):
         })
 
         return context
+
 
 class LoginView(DjangoLoginView):
     template_name = 'main.html'
@@ -43,3 +50,10 @@ class LogoutView(DjangoLogoutView):
     def post(self, request, *args, **kwargs):
         messages.success(self.request, 'User logged out successfully.')
         return super(LogoutView, self).post(request, *args, **kwargs)
+
+
+class AuditView(View):
+    @staticmethod
+    def post(*args, **kwargs):
+        financial_audit.delay()
+        return HttpResponse(status=204)
