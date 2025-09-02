@@ -75,3 +75,24 @@ class AuditConsumer(AsyncWebsocketConsumer):
 
     async def progress_update(self, event):
         await self.send(text_data=json.dumps({"progress": event["progress"]}))
+
+
+class DeclarationConsumer(AsyncWebsocketConsumer):
+    group_name = 'declaration'
+
+    async def connect(self):
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    async def declaration_upload(self, event):
+        today_count = event['today_count']
+
+        count_html = await sync_to_async(render_to_string)(
+            template_name='partials/declarations_count.html',
+            context={'today_count': today_count}
+        )
+
+        await self.send(text_data=count_html)

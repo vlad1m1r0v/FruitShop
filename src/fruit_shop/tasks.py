@@ -51,7 +51,7 @@ def financial_audit():
     channel_layer = get_channel_layer()
 
     for i in range(50):
-        chunk = os.urandom(1024 * 1024 * 64)
+        chunk = os.urandom(1024 * 1024 * 96)
 
         progress = i * 2
 

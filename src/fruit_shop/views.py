@@ -1,8 +1,13 @@
-from django.http.response import HttpResponse
+from django.utils.timezone import now
+from django.http.response import (
+    HttpResponse,
+    JsonResponse
+)
 from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
 from django.views.generic import (
     TemplateView,
+    FormView,
     View
 )
 from django.contrib.auth.views import (
@@ -12,7 +17,16 @@ from django.contrib.auth.views import (
 from django.contrib.auth import login
 from django.contrib import messages
 
-from .forms import AuthenticationForm
+from asgiref.sync import async_to_sync
+
+from channels.layers import get_channel_layer
+
+from .models import Declaration
+
+from .forms import (
+    AuthenticationForm,
+    DeclarationForm
+)
 
 from .tasks import financial_audit
 
@@ -23,8 +37,14 @@ class PageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(PageView, self).get_context_data(**kwargs)
 
+        today_count = Declaration.objects.filter(
+            timestamp__date=now().date()
+        ).count()
+
         context.update({
             'auth_form': AuthenticationForm(),
+            'declaration_form': DeclarationForm(),
+            'declarations_count': today_count,
         })
 
         return context
@@ -57,3 +77,31 @@ class AuditView(View):
     def post(*args, **kwargs):
         financial_audit.delay()
         return HttpResponse(status=204)
+
+
+class DeclarationView(FormView):
+    form_class = DeclarationForm
+
+    def form_valid(self, form):
+        form.save()
+
+        today_count = Declaration.objects.filter(
+            timestamp__date=now().date()
+        ).count()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'declaration',
+            {
+                'type': 'declaration_upload',
+                'today_count': today_count
+            }
+        )
+
+        return HttpResponse(status=204)
+
+    def form_invalid(self, form):
+        return JsonResponse(
+            status=400,
+            data={'error': 'Invalid file format: expected xlsx or xls.'}
+        )

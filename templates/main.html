@@ -251,12 +251,33 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="d-flex flex-row align-items-center">
-                        <div class="input-group me-2">
-                            <input type="file" class="form-control">
-                        </div>
+                    <div
+                            hx-ext="ws"
+                            ws-connect="ws://{{ request.get_host }}/ws/declaration/"
+                            class="d-flex flex-row align-items-center"
+                    >
+                        <form
+                                class="d-flex align-items-center mb-0"
+                                hx-post="{% url 'app:declaration' %}"
+                                hx-target="this"
+                                hx-swap="none"
+                                enctype="multipart/form-data"
+                        >
+                            <div class="input-group me-2">
+                                {{ declaration_form.file }}
+                            </div>
+                            <button
+                                    class="btn btn-outline-success me-2"
+                                    type="submit"
+                                    {% if not request.user.is_authenticated %}
+                                    disabled
+                                    {% endif %}
+                            >
+                                Upload
+                            </button>
+                        </form>
                         <div>
-                            <p class="mb-0 text-nowrap">Uploaded today: 10</p>
+                            {% include 'partials/declarations_count.html' with today_count=declarations_count %}
                         </div>
                     </div>
                 </div>
@@ -294,7 +315,16 @@
         }
     });
 
-    const audit = document.getElementById("audit")
+    document.body.addEventListener('htmx:responseError', function (evt) {
+        const response = evt.detail.xhr.response;
+        const {error} = JSON.parse(response);
+        Toast.fire({
+            icon: 'error',
+            text: error
+        });
+    });
+
+    const audit = document.getElementById("audit");
     const progressBar = document.getElementById("progress");
 
     audit.addEventListener("htmx:wsBeforeMessage", function (e) {
