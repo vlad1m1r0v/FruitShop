@@ -137,32 +137,32 @@ def trade_fruits(action, fruit_type):
 
 
 @shared_task(name="buy_apples", queue="warehouse")
-def buy_apples(): trade_fruits("BUY", Fruit.Type.APPLE)
+def buy_apples(): trade_fruits("Buy", Fruit.Type.APPLE)
 
 
 @shared_task(name="buy_bananas", queue="warehouse")
-def buy_bananas(): trade_fruits("BUY", Fruit.Type.BANANA)
+def buy_bananas(): trade_fruits("Buy", Fruit.Type.BANANA)
 
 
 @shared_task(name="buy_pineapples", queue="warehouse")
-def buy_pineapples(): trade_fruits("BUY", Fruit.Type.PINEAPPLE)
+def buy_pineapples(): trade_fruits("Buy", Fruit.Type.PINEAPPLE)
 
 
 @shared_task(name="buy_peaches", queue="warehouse")
-def buy_peaches(): trade_fruits("BUY", Fruit.Type.PEACH)
+def buy_peaches(): trade_fruits("Buy", Fruit.Type.PEACH)
 
 
 @shared_task(name="sell_apples", queue="warehouse")
-def sell_apples(): trade_fruits("SELL", Fruit.Type.APPLE)
+def sell_apples(): trade_fruits("Sell", Fruit.Type.APPLE)
 
 
 @shared_task(name="sell_bananas", queue="warehouse")
-def sell_bananas(): trade_fruits("SELL", Fruit.Type.BANANA)
+def sell_bananas(): trade_fruits("Sell", Fruit.Type.BANANA)
 
 
 @shared_task(name="sell_pineapples", queue="warehouse")
-def sell_pineapples(): trade_fruits("SELL", Fruit.Type.PINEAPPLE)
+def sell_pineapples(): trade_fruits("Sell", Fruit.Type.PINEAPPLE)
 
 
 @shared_task(name="sell_peaches", queue="warehouse")
-def sell_peaches(): trade_fruits("SELL", Fruit.Type.PEACH)
+def sell_peaches(): trade_fruits("Sell", Fruit.Type.PEACH)

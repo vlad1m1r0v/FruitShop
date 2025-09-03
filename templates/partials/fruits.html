@@ -17,7 +17,7 @@
             {% if fruit.successful_trades %}
                 {% with trade=fruit.successful_trades.0 %}
                     {{ trade.timestamp|date:"d.m.y H:i:s" }} -
-                    {% if trade.action == 'BUY' %}
+                    {% if trade.action == 'Buy' %}
                         Bought
                     {% else %}
                         Sold

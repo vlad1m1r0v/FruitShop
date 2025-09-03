@@ -139,7 +139,7 @@
                         <th>Latest operations</th>
                     </tr>
                     </thead>
-                    <tbody hx-get="/warehouse" hx-trigger="every 15s" hx-swap="innerHTML">
+                    <tbody hx-get="/warehouse" hx-trigger="every 2s" hx-swap="innerHTML">
                     {% include 'partials/fruits.html' with fruits=fruits %}
                     </tbody>
                 </table>
@@ -284,9 +284,6 @@
 
     document.addEventListener('htmx:oobAfterSwap', function (event) {
         const target = event.detail.target;
-
-        console.log(target);
-
         if (target.tagName === 'UL') {
             target.scroll({
                 top: target.scrollHeight,
