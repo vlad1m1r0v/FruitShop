@@ -1,0 +1,35 @@
+<div hx-swap-oob="beforeend:#trades__list">
+    {% for trade in trades %}
+        <li class="list-group-item">
+        <span class="text-{% if trade.status == 'Success' %}success{% else %}danger{% endif %}">
+            {{ trade.timestamp|date:"d.m.y H:i:s" }} - {{ trade.status|upper }}:
+            {% if trade.action == 'Buy' %}
+                The supplier delivered
+            {% else %}
+                The customer ordered
+            {% endif %}
+            {{ trade.quantity }}
+            {% if trade.fruit.name == 'Peach' %}
+                peaches
+            {% else %}
+                {{ trade.fruit.name|lower }}s
+            {% endif %}.
+            {% if trade.status == 'Error' %}
+                {% if trade.action == 'Buy' %}
+                    Insufficient funds in the account.
+                    Purchase canceled.
+                {% else %}
+                    Not enough units in stock.
+                    Sale canceled.
+                {% endif %}
+            {% else %}
+                {% if trade.action == 'Buy' %}
+                    Purchase completed.
+                {% else %}
+                    Sale completed.
+                {% endif %}
+            {% endif %}
+        </span>
+        </li>
+    {% endfor %}
+</div>

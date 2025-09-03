@@ -6,7 +6,10 @@ from django.template.loader import render_to_string
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from src.fruit_shop.models import Message
+from src.fruit_shop.models import (
+    Message,
+    Trade
+)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -52,8 +55,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.channel_layer.group_send(
-            group=self.group_name,
-            message={
+            self.group_name,
+            {
                 'type': 'chat_message',
                 'html': message_html
             }
@@ -96,3 +99,60 @@ class DeclarationConsumer(AsyncWebsocketConsumer):
         )
 
         await self.send(text_data=count_html)
+
+
+class BalanceConsumer(AsyncWebsocketConsumer):
+    group_name = 'balance'
+
+    async def connect(self):
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    async def balance_update(self, event):
+        balance = event['balance']
+
+        balance_html = await sync_to_async(render_to_string)(
+            template_name='partials/balance.html',
+            context={'balance': balance}
+        )
+
+        await self.send(text_data=balance_html)
+
+
+class TradeConsumer(AsyncWebsocketConsumer):
+    group_name = 'trade'
+
+    async def connect(self):
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+        trades = await sync_to_async(
+            lambda: list(Trade.objects.order_by('-timestamp').select_related('fruit'))
+        )()
+
+        trades_html = await sync_to_async(render_to_string)(
+            template_name='partials/trade_log.html',
+            context={'trades': reversed(trades)}
+        )
+
+        await self.send(text_data=trades_html)
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+
+    async def trade_log(self, event):
+        query = lambda: Trade.objects.select_related('fruit').get(pk=event.get("id"))
+        trade = await sync_to_async(query)()
+
+        trades_html = await sync_to_async(render_to_string)(
+            template_name='partials/trade_log.html',
+            context={'trades': [trade]}
+        )
+
+        await self.send(text_data=trades_html)

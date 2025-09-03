@@ -1,11 +1,64 @@
+import os
+
+import random
+
+from django.conf import settings
+from django.core.files import File
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 
-from src.fruit_shop.models import Message
+from src.fruit_shop.models import (
+    Message,
+    Fruit,
+    Balance,
+    Declaration,
+    Trade,
+)
 
 
-def create_users() -> list[User]:
+def create_fruits() -> list[Fruit]:
+    Fruit.objects.all().delete()
+
+    fruits: list[Fruit] = [
+        Fruit(name="Apple", price=5, quantity=100000),
+        Fruit(name="Banana", price=2, quantity=100000),
+        Fruit(name="Pineapple", price=4, quantity=100000),
+        Fruit(name="Peach", price=3, quantity=100000)
+    ]
+
+    return Fruit.objects.bulk_create(fruits)
+
+
+def create_trades(fruits: list[Fruit]):
+    Trade.objects.all().delete()
+
+    trades_to_create: list[Trade] = []
+
+    for fruit in fruits:
+        for i in range(10):
+            action = Trade.Action.BUY if i % 2 == 0 else Trade.Action.SELL
+
+            trade = Trade(
+                fruit=fruit,
+                quantity=random.randint(
+                    *fruit.get_range(action=action, fruit_type=fruit.name)
+                ),
+                action=action,
+                status=random.choice(list(Trade.Status))
+            )
+
+            trades_to_create.append(trade)
+
+    Trade.objects.bulk_create(trades_to_create)
+
+
+def create_balance():
+    Balance.objects.all().delete()
+    Balance.objects.create(value=1000000)
+
+
+def create_users():
     User.objects.all().delete()
 
     users_to_create = [
@@ -26,7 +79,7 @@ def create_users() -> list[User]:
     User.objects.bulk_create(users_to_create)
 
 
-def create_messages() -> list[Message]:
+def create_messages():
     Message.objects.all().delete()
 
     users = User.objects.exclude(username="Joker🤡")
@@ -87,12 +140,30 @@ def create_messages() -> list[Message]:
     Message.objects.bulk_create(messages_to_create)
 
 
+def create_declarations():
+    Declaration.objects.all().delete()
+
+    datasets_dir = os.path.join(settings.BASE_DIR, 'datasets')
+
+    for filename in os.listdir(datasets_dir):
+        file_path = os.path.join(datasets_dir, filename)
+
+        with open(file_path, 'rb') as f:
+            file_object = File(f, name=filename)
+            declaration = Declaration(file=file_object)
+            declaration.save()
+
+
 class Command(BaseCommand):
     help = "Fill database with initial data"
 
     def handle(self, *args, **options):
+        fruits = create_fruits()
+        create_trades(fruits)
+        create_balance()
         create_users()
         create_messages()
+        create_declarations()
 
         self.stdout.write(
             self.style.SUCCESS("Init project command finished successfully.")

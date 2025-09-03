@@ -144,12 +144,42 @@ from kombu import Queue
 CELERY_TASK_DEFAULT_QUEUE = "default"
 
 CELERY_TASK_QUEUES = (
-    Queue("default", routing_key="default"),
+    Queue("warehouse", routing_key="warehouse"),
     Queue("jokes", routing_key="jokes"),
     Queue("audit", routing_key="audit"),
 )
 
-CELERY_TASK_ROUTES = {
-    "send_joke": {"queue": "jokes", "routing_key": "jokes"},
-    "financial_audit": {"queue": "audit", "routing_key": "audit"},
+CELERY_BEAT_SCHEDULE = {
+    "buy_apples": {
+        "task": "buy_apples",
+        "schedule": 6.0,
+    },
+    "buy_bananas": {
+        "task": "buy_bananas",
+        "schedule": 9.0,
+    },
+    "buy_pineapples": {
+        "task": "buy_pineapples",
+        "schedule": 12.0,
+    },
+    "buy_peaches": {
+        "task": "buy_peaches",
+        "schedule": 15.0,
+    },
+    "sell_apples": {
+        "task": "sell_apples",
+        "schedule": 15.0,
+    },
+    "sell_bananas": {
+        "task": "sell_bananas",
+        "schedule": 12.0,
+    },
+    "sell_pineapples": {
+        "task": "sell_pineapples",
+        "schedule": 9.0,
+    },
+    "sell_peaches": {
+        "task": "sell_peaches",
+        "schedule": 6.0,
+    },
 }

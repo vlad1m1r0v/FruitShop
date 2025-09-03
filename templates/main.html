@@ -19,7 +19,7 @@
             grid-template-areas:
                     "w w e"
                     "c b e";
-            grid-template-rows: 3fr 2fr;
+            grid-template-rows: repeat(2, 1fr);
             grid-template-columns: repeat(3, 1fr);
             grid-gap: 0.5em;
         }
@@ -31,11 +31,18 @@
             overflow: auto;
         }
 
-        #events {
+        #trades {
             grid-area: e;
             width: 100%;
             height: 100%;
             overflow: auto;
+        }
+
+        #trades ul {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
         }
 
         #chat {
@@ -81,7 +88,7 @@
                 grid-gap: 0.5em;
             }
 
-            #events-list, #messages-list {
+            #trades ul, #chat ul {
                 max-height: 500px;
                 overflow-y: auto;
             }
@@ -113,7 +120,14 @@
                         <th colspan="4">
                             <div class="d-flex align-items-center">
                                 <span class="text-center w-100">Products in warehouse</span>
-                                <button class="btn btn-outline-success ms-auto">Check the warehouse</button>
+                                <button
+                                        class="btn btn-outline-success ms-auto"
+                                        {% if not request.user.is_authenticated %}
+                                        disabled
+                                        {% endif %}
+                                >
+                                    Check the warehouse
+                                </button>
                             </div>
                         </th>
                     </tr>
@@ -125,54 +139,18 @@
                         <th>Latest operations</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    {% for _ in '012345'|make_list %}
-                        <tr>
-                            <td>Peach</td>
-                            <td>10</td>
-                            <td>
-                                <div class="d-flex flex-nowrap">
-                                    <label>
-                                        <input style="width: 100px" class="form-control me-2" type="number"
-                                               placeholder="...">
-                                    </label>
-                                    <button class="btn btn-outline-success me-2">Buy</button>
-                                    <button class="btn btn-outline-primary me-2">Sell</button>
-                                </div>
-                            </td>
-                            <td>30.08.25 12:00:00 - Delivered 5 peaches for 20 $</td>
-                        </tr>
-                    {% endfor %}
+                    <tbody hx-get="/warehouse" hx-trigger="every 15s" hx-swap="innerHTML">
+                    {% include 'partials/fruits.html' with fruits=fruits %}
                     </tbody>
                 </table>
             </div>
         </div>
-        <div id="events">
-            <ul id="events-list" class="list-group rounded-0">
-                {% for index in '0123456789'|make_list %}
-                    {% if forloop.counter0|divisibleby:2 %}
-                        <li class="list-group-item">
-                                <span class="text-danger">
-                                    30.08.25 12:00:00 - ERROR: The supplier delivered 10 peaches. Insufficient funds in
-                                    the account. Purchase
-                                    canceled.
-                                </span>
-                        </li>
-                    {% else %}
-                        <li class="list-group-item">
-                                <span class="text-success">
-                                    30.08.25 12:00:00 - SUCCESS: The supplier delivered 10 peaches. $20 was debited from
-                                    the account. The purchase is
-                                    complete.
-                                </span>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+        <div hx-ext="ws" ws-connect="ws://{{ request.get_host }}/ws/trade/" id="trades">
+            <ul id="trades__list" class="list-group rounded-0"></ul>
         </div>
         <div hx-ext="ws" ws-connect="ws://{{ request.get_host }}/ws/chat/" id="chat"
         >
-            <ul id="messages-list" class="list-group rounded-0"></ul>
+            <ul id="chat__list" class="list-group rounded-0"></ul>
             <form ws-send class="d-flex flex-row mt-2"
             >
                 <input
@@ -203,9 +181,9 @@
                 <div class="row">
                     <table class="table table-bordered text-center align-middle text-nowrap">
                         <tbody>
-                        <tr>
+                        <tr hx-ext="ws" ws-connect="ws://{{ request.get_host }}/ws/balance/">
                             <td class="w-50">Balance</td>
-                            <td class="w-50">1 000 000</td>
+                            {% include 'partials/balance.html' with balance=balance %}
                         </tr>
                         </tbody>
                     </table>
@@ -306,6 +284,8 @@
 
     document.addEventListener('htmx:oobAfterSwap', function (event) {
         const target = event.detail.target;
+
+        console.log(target);
 
         if (target.tagName === 'UL') {
             target.scroll({

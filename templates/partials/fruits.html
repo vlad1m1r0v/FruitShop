@@ -1,0 +1,38 @@
+{% load multiply %}
+{% for fruit in fruits %}
+    <tr>
+        <td>{{ fruit.name }}</td>
+        <td>{{ fruit.quantity }}</td>
+        <td id="{{ fruit.name }}" hx-preserve="true">
+            <div class="d-flex flex-nowrap">
+                <label>
+                    <input style="width: 100px" class="form-control me-2" type="number"
+                           placeholder="...">
+                </label>
+                <button class="btn btn-outline-success me-2">Buy</button>
+                <button class="btn btn-outline-primary me-2">Sell</button>
+            </div>
+        </td>
+        <td>
+            {% if fruit.successful_trades %}
+                {% with trade=fruit.successful_trades.0 %}
+                    {{ trade.timestamp|date:"d.m.y H:i:s" }} -
+                    {% if trade.action == 'BUY' %}
+                        Bought
+                    {% else %}
+                        Sold
+                    {% endif %}
+                    {{ trade.quantity }}
+                    {% if fruit.name == 'Peach' %}
+                        peaches
+                    {% else %}
+                        {{ fruit.name|lower }}s
+                    {% endif %}
+                    for {{ trade.quantity|multiply:fruit.price }}.
+                {% endwith %}
+            {% else %}
+                No successful trades.
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
