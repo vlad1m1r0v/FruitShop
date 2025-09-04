@@ -182,9 +182,6 @@ class BalanceView(View):
     def post(self, *args, **kwargs):
         action = self.request.POST.get("action")
         amount = self.request.POST.get("amount")
-
-        print(f"ACTION: {action}; AMOUNT: {amount}")
-
         update_balance.delay(action, amount)
 
         return HttpResponse(status=204)
