@@ -21,10 +21,10 @@ def create_fruits() -> list[Fruit]:
     Fruit.objects.all().delete()
 
     fruits: list[Fruit] = [
-        Fruit(name="Apple", price=5, quantity=100000),
-        Fruit(name="Banana", price=2, quantity=100000),
-        Fruit(name="Pineapple", price=4, quantity=100000),
-        Fruit(name="Peach", price=3, quantity=100000)
+        Fruit(name="Apple", quantity=100000),
+        Fruit(name="Banana", quantity=100000),
+        Fruit(name="Pineapple", quantity=100000),
+        Fruit(name="Peach", quantity=100000)
     ]
 
     return Fruit.objects.bulk_create(fruits)

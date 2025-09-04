@@ -3,32 +3,53 @@
     <tr>
         <td>{{ fruit.name }}</td>
         <td>{{ fruit.quantity }}</td>
-        <td id="{{ fruit.name }}" hx-preserve="true">
+        <td id="{{ fruit.name }}">
             <div class="d-flex flex-nowrap">
                 <label>
-                    <input style="width: 100px" class="form-control me-2" type="number"
-                           placeholder="...">
+                    <input
+                            name="quantity"
+                            style="width: 100px"
+                            class="form-control me-2"
+                            type="number"
+                            placeholder="..."
+                            {% if not request.user.is_authenticated %}disabled{% endif %}
+                    >
                 </label>
-                <button class="btn btn-outline-success me-2">Buy</button>
-                <button class="btn btn-outline-primary me-2">Sell</button>
+                <button
+                        class="btn btn-outline-success me-2"
+                        hx-post="{% url 'app:trade' %}"
+                        hx-include="closest tr"
+                        hx-vals='{"action": "Buy", "fruit": "{{ fruit.name }}"}'
+                        hx-swap="none"
+                        {% if not request.user.is_authenticated %}disabled{% endif %}
+                >
+                    Buy
+                </button>
+                <button
+                        class="btn btn-outline-primary me-2"
+                        hx-post="{% url 'app:trade' %}"
+                        hx-include="closest tr"
+                        hx-vals='{"action": "Sell", "fruit": "{{ fruit.name }}"}'
+                        hx-swap="none"
+                        {% if not request.user.is_authenticated %}disabled{% endif %}
+                >
+                    Sell
+                </button>
             </div>
         </td>
         <td>
             {% if fruit.successful_trades %}
                 {% with trade=fruit.successful_trades.0 %}
                     {{ trade.timestamp|date:"d.m.y H:i:s" }} -
-                    {% if trade.action == 'Buy' %}
-                        Bought
-                    {% else %}
-                        Sold
-                    {% endif %}
+                    {% if trade.action == 'Buy' %}Bought{% else %}Sold{% endif %}
                     {{ trade.quantity }}
-                    {% if fruit.name == 'Peach' %}
-                        peaches
+                    {% if fruit.name == 'Peach' %}peaches{% else %}{{ fruit.name|lower }}s{% endif %}
+                    for
+                    {% if trade.action == 'Buy' %}
+                        {{ trade.quantity|multiply:fruit.buy_price }}
                     {% else %}
-                        {{ fruit.name|lower }}s
-                    {% endif %}
-                    for {{ trade.quantity|multiply:fruit.price }}.
+                        {{ trade.quantity|multiply:fruit.sell_price}}
+                    {% endif %}$.
                 {% endwith %}
             {% else %}
                 No successful trades.

@@ -114,7 +114,7 @@
     <div id="container" class="container-xl py-2">
         <div id="warehouse">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped table-hover align-middle text-nowrap">
+                <table hx-ext="morph" class="table table-bordered table-striped table-hover align-middle text-nowrap">
                     <thead class="text-center">
                     <tr>
                         <th colspan="4">
@@ -131,7 +131,6 @@
                             </div>
                         </th>
                     </tr>
-
                     <tr>
                         <th>Name</th>
                         <th>Quantity</th>
@@ -139,7 +138,11 @@
                         <th>Latest operations</th>
                     </tr>
                     </thead>
-                    <tbody hx-get="/warehouse" hx-trigger="every 2s" hx-swap="innerHTML">
+                    <tbody hx-ext="morph"
+                           hx-get="/warehouse"
+                           hx-trigger="every 2s"
+                           hx-swap="morph:{ignoreActiveValue:true,morphStyle:'innerHTML'}"
+                    >
                     {% include 'partials/fruits.html' with fruits=fruits %}
                     </tbody>
                 </table>
@@ -157,6 +160,8 @@
                         name="message"
                         class="form-control w-100 me-2"
                         type="text"
+                        minlength="3"
+                        maxlength="100"
                         placeholder="Type here..."
                         {% if not request.user.is_authenticated %}
                         disabled
@@ -276,6 +281,13 @@
 </html>
 <!--HTMX WebSockets-->
 <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.3/ws.min.js"></script>
+<!--HTMX Idimorph-->
+<script src="https://unpkg.com/idiomorph@0.7.3"
+        integrity="sha384-JcorokHTL/m+D6ZHe2+yFVQopVwZ+91GxAPDyEZ6/A/OEPGEx1+MeNSe2OGvoRS9"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/idiomorph@0.7.3/dist/idiomorph-ext.min.js"
+        integrity="sha384-szktAZju9fwY15dZ6D2FKFN4eZoltuXiHStNDJWK9+FARrxJtquql828JzikODob"
+        crossorigin="anonymous"></script>
 {% include "partials/toasts.html" %}
 <script>
     document.querySelector("form[ws-send]").addEventListener("htmx:wsAfterSend", function (e) {

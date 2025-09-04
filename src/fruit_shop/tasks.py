@@ -81,14 +81,16 @@ def financial_audit():
 
 
 @transaction.atomic
-def trade_fruits(action, fruit_type):
+def trade_fruits(action, fruit_type, quantity=None):
     channel_layer = get_channel_layer()
 
     balance = Balance.objects.select_for_update().first()
     fruit = Fruit.objects.select_for_update().get(name=fruit_type)
 
-    quantity = random.randint(*Fruit.get_range(action, fruit_type))
-    price = Fruit.get_buy_price(fruit_type) if action == Trade.Action.BUY else Fruit.get_sell_price(fruit_type)
+    if not quantity:
+        quantity = random.randint(*fruit.get_range(action))
+
+    price = fruit.buy_price if action == Trade.Action.BUY else fruit.sell_price
     total_price = quantity * price
 
     success = False
@@ -166,3 +168,8 @@ def sell_pineapples(): trade_fruits("Sell", Fruit.Type.PINEAPPLE)
 
 @shared_task(name="sell_peaches", queue="warehouse")
 def sell_peaches(): trade_fruits("Sell", Fruit.Type.PEACH)
+
+
+@shared_task(name="trade_fruit", queue="warehouse")
+def trade_fruit(action, fruit_type, quantity):
+    trade_fruits(action, fruit_type, quantity)

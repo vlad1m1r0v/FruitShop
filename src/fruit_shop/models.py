@@ -21,7 +21,6 @@ class Fruit(models.Model):
         PEACH = "Peach"
 
     name = models.CharField(max_length=50, choices=Type.choices, unique=True)
-    price = models.PositiveIntegerField(default=0)
     quantity = models.PositiveIntegerField(default=0)
 
     BUY_PRICE = {
@@ -51,6 +50,19 @@ class Fruit(models.Model):
         Type.PINEAPPLE: (1, 10),
         Type.PEACH: (1, 20),
     }
+
+    def range(self, action):
+        if action == "Buy":
+            return self.BUY_RANGE[Fruit.Type(self.name)]
+        return self.SELL_RANGE[Fruit.Type(self.name)]
+
+    @property
+    def buy_price(self):
+        return self.BUY_PRICE[Fruit.Type(self.name)]
+
+    @property
+    def sell_price(self):
+        return self.SELL_PRICE[Fruit.Type(self.name)]
 
     @classmethod
     def get_buy_price(cls, fruit_type):

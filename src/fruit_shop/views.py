@@ -35,7 +35,10 @@ from .forms import (
     DeclarationForm
 )
 
-from .tasks import financial_audit
+from .tasks import (
+    financial_audit,
+    trade_fruit
+)
 
 
 class PageView(TemplateView):
@@ -137,8 +140,7 @@ class DeclarationView(FormView):
 
 
 class WarehouseView(View):
-    @staticmethod
-    def get(*args, **kwargs):
+    def get(self, *args, **kwargs):
         last_trades_qs = (
             Trade.objects
             .filter(status=Trade.Status.SUCCESS)
@@ -160,6 +162,16 @@ class WarehouseView(View):
         return HttpResponse(
             render_to_string(
                 template_name="partials/fruits.html",
-                context={'fruits': fruits}
+                context={'fruits': fruits, 'request': self.request}
             )
         )
+
+
+class TradeView(View):
+    def post(self, *args, **kwargs):
+        action = self.request.POST.get("action")
+        fruit = self.request.POST.get("fruit")
+        quantity = self.request.POST.get("quantity")
+        trade_fruit.delay(action, fruit, int(quantity))
+
+        return HttpResponse(status=204)
