@@ -173,3 +173,27 @@ def sell_peaches(): trade_fruits("Sell", Fruit.Type.PEACH)
 @shared_task(name="trade_fruit", queue="warehouse")
 def trade_fruit(action, fruit_type, quantity):
     trade_fruits(action, fruit_type, quantity)
+
+
+@shared_task(name="update_balance", queue="balance")
+def update_balance(action: str, amount: int):
+    channel_layer = get_channel_layer()
+
+    with transaction.atomic():
+        balance = Balance.objects.select_for_update().first()
+
+        if action == "Replenish":
+            balance.value = F("value") + amount
+        elif action == "Withdraw":
+            balance.value = F("value") - amount
+
+        balance.save()
+        balance.refresh_from_db()
+
+        transaction.on_commit(lambda: async_to_sync(channel_layer.group_send)(
+            "balance",
+            {
+                "type": "balance_update",
+                "balance": balance.value,
+            }
+        ))

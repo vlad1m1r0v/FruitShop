@@ -147,6 +147,7 @@ CELERY_TASK_QUEUES = (
     Queue("warehouse", routing_key="warehouse"),
     Queue("jokes", routing_key="jokes"),
     Queue("audit", routing_key="audit"),
+    Queue("balance", routing_key="balance"),
 )
 
 CELERY_BEAT_SCHEDULE = {

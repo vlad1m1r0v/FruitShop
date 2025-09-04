@@ -154,8 +154,7 @@
         <div hx-ext="ws" ws-connect="ws://{{ request.get_host }}/ws/chat/" id="chat"
         >
             <ul id="chat__list" class="list-group rounded-0"></ul>
-            <form ws-send class="d-flex flex-row mt-2"
-            >
+            <form ws-send class="d-flex flex-row mt-2" hx-on::ws-after-send="this.reset()">
                 <input
                         name="message"
                         class="form-control w-100 me-2"
@@ -226,10 +225,43 @@
                 <div class="row">
                     <div class="col">
                         <div class="d-flex flex-row mb-2">
-                            <input class="form-control w-100 me-2" type="number" placeholder="..."
-                                   aria-label="Amount"/>
-                            <button class="btn btn-outline-success w-100 me-2">Replenish</button>
-                            <button class="btn btn-outline-primary w-100">Withdraw</button>
+                            <form
+                                    class="d-flex gap-2 w-100"
+                                    hx-post="{% url 'app:balance' %}"
+                                    hx-target="this"
+                                    hx-swap="none"
+                                    hx-on::after-request="this.reset()"
+                            >
+                                <input
+                                        name="amount"
+                                        type="number"
+                                        min="1"
+                                        max="100000"
+                                        placeholder="..."
+                                        required
+                                        class="form-control w-100"
+                                        {% if not request.user.is_authenticated %}disabled{% endif %}
+                                />
+
+                                <button
+                                        type="submit"
+                                        name="action"
+                                        value="Replenish"
+                                        class="btn btn-outline-success w-100"
+                                        {% if not request.user.is_authenticated %}disabled{% endif %}
+                                >
+                                    Replenish
+                                </button>
+                                <button
+                                        type="submit"
+                                        name="action"
+                                        value="Withdraw"
+                                        class="btn btn-outline-primary w-100"
+                                        {% if not request.user.is_authenticated %}disabled{% endif %}
+                                >
+                                    Withdraw
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -281,7 +313,7 @@
 </html>
 <!--HTMX WebSockets-->
 <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.3/ws.min.js"></script>
-<!--HTMX Idimorph-->
+<!--HTMX Idiomorph-->
 <script src="https://unpkg.com/idiomorph@0.7.3"
         integrity="sha384-JcorokHTL/m+D6ZHe2+yFVQopVwZ+91GxAPDyEZ6/A/OEPGEx1+MeNSe2OGvoRS9"
         crossorigin="anonymous"></script>
@@ -290,10 +322,6 @@
         crossorigin="anonymous"></script>
 {% include "partials/toasts.html" %}
 <script>
-    document.querySelector("form[ws-send]").addEventListener("htmx:wsAfterSend", function (e) {
-        e.target.reset();
-    });
-
     document.addEventListener('htmx:oobAfterSwap', function (event) {
         const target = event.detail.target;
         if (target.tagName === 'UL') {
