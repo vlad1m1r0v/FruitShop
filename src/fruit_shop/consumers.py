@@ -156,3 +156,23 @@ class TradeConsumer(AsyncWebsocketConsumer):
         )
 
         await self.send(text_data=trades_html)
+
+
+class WarehouseConsumer(AsyncWebsocketConsumer):
+    async def checking_finished(self, _event):
+        await self.send(json.dumps({"status": "Finished"}))
+
+    async def checking_started(self, _event):
+        await self.send(json.dumps({"status": "Started"}))
+
+    async def connect(self):
+        await super().connect()
+
+        task_id = self.scope.get("url_route").get("kwargs").get("task_id")
+
+        await self.channel_layer.group_add(task_id, self.channel_name)
+
+        await self.channel_layer.group_send(task_id, {"type": "checking_started"})
+
+    async def disconnect(self, close_code):
+        await self.close()

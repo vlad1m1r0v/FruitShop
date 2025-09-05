@@ -38,7 +38,8 @@ from .forms import (
 from .tasks import (
     financial_audit,
     trade_fruit,
-    update_balance
+    update_balance,
+    check_warehouse
 )
 
 
@@ -185,3 +186,10 @@ class BalanceView(View):
         update_balance.delay(action, amount)
 
         return HttpResponse(status=204)
+
+
+class WarehouseCheckView(View):
+    @staticmethod
+    def post(*args, **kwargs):
+        celery_task = check_warehouse.delay()
+        return JsonResponse({'task_id': celery_task.id})

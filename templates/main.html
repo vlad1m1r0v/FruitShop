@@ -121,6 +121,7 @@
                             <div class="d-flex align-items-center">
                                 <span class="text-center w-100">Products in warehouse</span>
                                 <button
+                                        id="warehouse__button"
                                         class="btn btn-outline-success ms-auto"
                                         {% if not request.user.is_authenticated %}
                                         disabled
@@ -140,7 +141,7 @@
                     </thead>
                     <tbody hx-ext="morph"
                            hx-get="/warehouse"
-                           hx-trigger="every 2s"
+                           hx-trigger="every 10s"
                            hx-swap="morph:{ignoreActiveValue:true,morphStyle:'innerHTML'}"
                     >
                     {% include 'partials/fruits.html' with fruits=fruits %}
@@ -349,5 +350,43 @@
         progressBar.style.width = progress + "%";
         progressBar.setAttribute("aria-valuenow", progress);
         progressBar.textContent = progress + "%";
+    });
+
+    const checkWarehouse = document.getElementById("warehouse__button");
+
+    checkWarehouse.addEventListener("click", async function () {
+        checkWarehouse.disabled = true;
+
+        const response = await fetch(
+            "warehouse/check/",
+            {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        const socket = new WebSocket(`ws://${window.location.host}/ws/warehouse/${data['task_id']}/`);
+
+        socket.onmessage = function (event) {
+            const {status} = JSON.parse(event.data);
+
+            if (status === 'Started') {
+                Toast.fire({
+                    icon: 'success',
+                    text: 'Warehouse checking started'
+                });
+            } else if (status === 'Finished') {
+                Toast.fire({
+                    icon: 'success',
+                    text: 'Warehouse checking finished'
+                });
+                checkWarehouse.disabled = false;
+                socket.close();
+            }
+        }
     });
 </script>

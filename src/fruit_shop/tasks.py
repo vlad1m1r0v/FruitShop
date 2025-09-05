@@ -138,39 +138,39 @@ def trade_fruits(action, fruit_type, quantity=None):
     transaction.on_commit(send_ws_events)
 
 
-@shared_task(name="buy_apples", queue="warehouse")
+@shared_task(name="buy_apples", queue="trade")
 def buy_apples(): trade_fruits("Buy", Fruit.Type.APPLE)
 
 
-@shared_task(name="buy_bananas", queue="warehouse")
+@shared_task(name="buy_bananas", queue="trade")
 def buy_bananas(): trade_fruits("Buy", Fruit.Type.BANANA)
 
 
-@shared_task(name="buy_pineapples", queue="warehouse")
+@shared_task(name="buy_pineapples", queue="trade")
 def buy_pineapples(): trade_fruits("Buy", Fruit.Type.PINEAPPLE)
 
 
-@shared_task(name="buy_peaches", queue="warehouse")
+@shared_task(name="buy_peaches", queue="trade")
 def buy_peaches(): trade_fruits("Buy", Fruit.Type.PEACH)
 
 
-@shared_task(name="sell_apples", queue="warehouse")
+@shared_task(name="sell_apples", queue="trade")
 def sell_apples(): trade_fruits("Sell", Fruit.Type.APPLE)
 
 
-@shared_task(name="sell_bananas", queue="warehouse")
+@shared_task(name="sell_bananas", queue="trade")
 def sell_bananas(): trade_fruits("Sell", Fruit.Type.BANANA)
 
 
-@shared_task(name="sell_pineapples", queue="warehouse")
+@shared_task(name="sell_pineapples", queue="trade")
 def sell_pineapples(): trade_fruits("Sell", Fruit.Type.PINEAPPLE)
 
 
-@shared_task(name="sell_peaches", queue="warehouse")
+@shared_task(name="sell_peaches", queue="trade")
 def sell_peaches(): trade_fruits("Sell", Fruit.Type.PEACH)
 
 
-@shared_task(name="trade_fruit", queue="warehouse")
+@shared_task(name="trade_fruit", queue="trade")
 def trade_fruit(action, fruit_type, quantity):
     trade_fruits(action, fruit_type, quantity)
 
@@ -197,3 +197,15 @@ def update_balance(action: str, amount: int):
                 "balance": balance.value,
             }
         ))
+
+
+@shared_task(bind=True, name="check_warehouse", queue="warehouse")
+def check_warehouse(self):
+    channel_layer = get_channel_layer()
+    task_id = self.request.id
+
+    for i in range(50):
+        chunk = os.urandom(1024 * 1024 * 32)
+        del chunk
+
+    async_to_sync(channel_layer.group_send)(task_id, {"type": "checking_finished"})
