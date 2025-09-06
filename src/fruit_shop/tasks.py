@@ -88,7 +88,7 @@ def trade_fruits(action, fruit_type, quantity=None):
     fruit = Fruit.objects.select_for_update().get(name=fruit_type)
 
     if not quantity:
-        quantity = random.randint(*fruit.get_range(action))
+        quantity = random.randint(*fruit.range(action))
 
     price = fruit.buy_price if action == Trade.Action.BUY else fruit.sell_price
     total_price = quantity * price

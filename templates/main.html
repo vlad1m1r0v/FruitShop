@@ -279,6 +279,7 @@
                                 class="d-flex align-items-center mb-0"
                                 hx-post="{% url 'app:declaration' %}"
                                 hx-target="this"
+                                hx-on::after-request="this.reset()"
                                 hx-swap="none"
                                 enctype="multipart/form-data"
                         >

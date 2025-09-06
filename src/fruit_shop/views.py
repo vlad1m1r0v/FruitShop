@@ -23,19 +23,19 @@ from asgiref.sync import async_to_sync
 
 from channels.layers import get_channel_layer
 
-from .models import (
+from src.fruit_shop.models import (
     Declaration,
     Balance,
     Fruit,
     Trade
 )
 
-from .forms import (
+from src.fruit_shop.forms import (
     AuthenticationForm,
     DeclarationForm
 )
 
-from .tasks import (
+from src.fruit_shop.tasks import (
     financial_audit,
     trade_fruit,
     update_balance,
