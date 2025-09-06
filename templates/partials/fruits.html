@@ -4,38 +4,43 @@
         <td>{{ fruit.name }}</td>
         <td>{{ fruit.quantity }}</td>
         <td id="{{ fruit.name }}">
-            <div class="d-flex flex-nowrap">
-                <label>
-                    <input
-                            name="quantity"
-                            style="width: 100px"
-                            class="form-control me-2"
-                            type="number"
-                            placeholder="..."
-                            {% if not request.user.is_authenticated %}disabled{% endif %}
-                    >
-                </label>
+            <form
+                    class="d-flex flex-nowrap"
+                    hx-post="{% url 'app:trade' %}"
+                    hx-swap="none"
+                    hx-vals='{"fruit": "{{ fruit.name }}"}'
+                    hx-on::after-request="this.reset()"
+            >
+                <input
+                        name="quantity"
+                        style="width: 100px"
+                        class="form-control me-2"
+                        type="number"
+                        min="1"
+                        max="100000"
+                        placeholder="..."
+                        required
+                        {% if not request.user.is_authenticated %}disabled{% endif %}
+                >
                 <button
+                        type="submit"
+                        name="action"
+                        value="Buy"
                         class="btn btn-outline-success me-2"
-                        hx-post="{% url 'app:trade' %}"
-                        hx-include="closest tr"
-                        hx-vals='{"action": "Buy", "fruit": "{{ fruit.name }}"}'
-                        hx-swap="none"
                         {% if not request.user.is_authenticated %}disabled{% endif %}
                 >
                     Buy
                 </button>
                 <button
+                        type="submit"
+                        name="action"
+                        value="Sell"
                         class="btn btn-outline-primary me-2"
-                        hx-post="{% url 'app:trade' %}"
-                        hx-include="closest tr"
-                        hx-vals='{"action": "Sell", "fruit": "{{ fruit.name }}"}'
-                        hx-swap="none"
                         {% if not request.user.is_authenticated %}disabled{% endif %}
                 >
                     Sell
                 </button>
-            </div>
+            </form>
         </td>
         <td>
             {% if fruit.successful_trades %}
@@ -48,7 +53,7 @@
                     {% if trade.action == 'Buy' %}
                         {{ trade.quantity|multiply:fruit.buy_price }}
                     {% else %}
-                        {{ trade.quantity|multiply:fruit.sell_price}}
+                        {{ trade.quantity|multiply:fruit.sell_price }}
                     {% endif %}$.
                 {% endwith %}
             {% else %}
