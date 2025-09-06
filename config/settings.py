@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'src.fruit_shop.apps.FruitShopConfig',
+    'src.core.apps.CoreConfig'
 ]
 
 MIDDLEWARE = [
