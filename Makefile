@@ -30,3 +30,6 @@ worker_audit:
 
 worker_balance:
 	$(WORKER) -Q balance
+
+worker_autoclean:
+	$(WORKER) -Q autoclean

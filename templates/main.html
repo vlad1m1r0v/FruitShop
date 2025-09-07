@@ -116,7 +116,7 @@
 <!--Main-->
 <div class="d-flex bg-body-tertiary">
     <div id="container" class="container-xl py-2">
-    <!--Warehouse-->
+        <!--Warehouse-->
         <div id="warehouse">
             <div class="table-responsive">
                 <table hx-ext="morph" class="table table-bordered table-striped table-hover align-middle text-nowrap">
@@ -154,14 +154,27 @@
                 </table>
             </div>
         </div>
-    <!--Trades-->
-        <div hx-ext="ws" ws-connect="ws://{{ request.get_host }}/ws/trade/" id="trades">
+        <!--Trades-->
+        <div
+                hx-ext="ws"
+                ws-connect="ws://{{ request.get_host }}/ws/trade/"
+                id="trades"
+                hx-on::ws-after-message="tradeList.scroll({top: tradeList.scrollHeight,behavior: 'smooth'})"
+        >
             <ul id="trades__list" class="list-group rounded-0"></ul>
         </div>
-    <!--Chat-->
-        <div hx-ext="ws" ws-connect="ws://{{ request.get_host }}/ws/chat/" id="chat"
+        <!--Chat-->
+        <div
+                hx-ext="ws"
+                ws-connect="ws://{{ request.get_host }}/ws/chat/"
+                id="chat"
+                hx-on::ws-after-message="chatList.scroll({top: chatList.scrollHeight,behavior: 'smooth'})"
         >
-            <ul id="chat__list" class="list-group rounded-0"></ul>
+            <ul
+                    id="chat__list"
+                    class="list-group rounded-0"
+            >
+            </ul>
             <form ws-send class="d-flex flex-row mt-2" hx-on::ws-after-send="this.reset()">
                 <input
                         name="message"
@@ -324,15 +337,8 @@
 <script src="{% static 'libraries/htmx_idiomorph/idiomorph-ext.min.js' %}"></script>
 {% include "partials/toasts.html" %}
 <script>
-    document.addEventListener('htmx:oobAfterSwap', function (event) {
-        const target = event.detail.target;
-        if (target.tagName === 'UL') {
-            target.scroll({
-                top: target.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-    });
+    const chatList = document.getElementById("chat__list");
+    const tradeList = document.getElementById("trades__list");
 
     document.body.addEventListener('htmx:responseError', function (evt) {
         const response = evt.detail.xhr.response;

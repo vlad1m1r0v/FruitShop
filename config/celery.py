@@ -1,5 +1,8 @@
 import os
+
 from celery import Celery
+from datetime import timedelta
+
 from kombu import Queue
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -16,6 +19,7 @@ app.conf.task_queues = (
     Queue("jokes", routing_key="jokes"),
     Queue("audit", routing_key="audit"),
     Queue("balance", routing_key="balance"),
+    Queue("autoclean", routing_key="autoclean"),
 )
 
 app.conf.beat_schedule = {
@@ -27,6 +31,8 @@ app.conf.beat_schedule = {
     "sell_bananas": {"task": "sell_bananas", "schedule": 12.0},
     "sell_pineapples": {"task": "sell_pineapples", "schedule": 9.0},
     "sell_peaches": {"task": "sell_peaches", "schedule": 6.0},
+    "clean_chat_history": {"task": "clean_chat_history", 'schedule': timedelta(hours=1)},
+    "clean_trade_logs": {"task": "clean_trade_logs", 'schedule': timedelta(minutes=5)},
 }
 
 app.autodiscover_tasks()

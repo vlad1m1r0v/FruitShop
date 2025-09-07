@@ -125,6 +125,19 @@ services:
     networks:
       - backend
 
+  worker_autoclean:
+    build:
+      context: .
+      dockerfile: deploy/celery/Dockerfile
+    container_name: worker_autoclean
+    command: make worker_autoclean
+    env_file: .env
+    depends_on:
+      - django
+      - redis
+    networks:
+      - backend
+
 volumes:
   postgres_data:
   static_volume:

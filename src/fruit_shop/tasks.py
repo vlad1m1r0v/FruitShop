@@ -209,3 +209,15 @@ def check_warehouse(self):
         del chunk
 
     async_to_sync(channel_layer.group_send)(task_id, {"type": "checking_finished"})
+
+
+@shared_task(name="clean_chat_history", queue="autoclean")
+def clean_chat_history():
+    last_ids = Message.objects.order_by('-timestamp')[:40].values_list('id', flat=True)
+    Message.objects.exclude(id__in=last_ids).delete()
+
+
+@shared_task(name="clean_trade_logs", queue="autoclean")
+def clean_trade_logs():
+    last_ids = Trade.objects.order_by('-timestamp')[:40].values_list('id', flat=True)
+    Trade.objects.exclude(id__in=last_ids).delete()
